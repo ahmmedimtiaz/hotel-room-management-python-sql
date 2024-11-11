@@ -6,10 +6,11 @@ class Database:
     try:
       connection = pymysql.connect(
         host="localhost",
+        port=3306,
         user="root",
         password="",
-        database="hotel_room_management",
-        port=3306
+        database="hotel_rooms_management",
+       
       )
       if connection.open:
         print("Database connection successful!")
@@ -22,3 +23,4 @@ class Database:
     if self.connection and self.connection.open:
         print("Closing database connection")
         self.connection.close()
+        

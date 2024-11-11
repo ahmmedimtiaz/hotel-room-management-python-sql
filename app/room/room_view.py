@@ -152,7 +152,7 @@ class RoomsView:
         # Insert new data into room list with action labels as text
         for room in rooms:
             room_id = room['Id']
-            self.room_list.insert("", "end", values=(room['roomNo'], room['type'], room['price'], room['status'], "Edit | Delete"))
+            self.room_list.insert("", "end", values=(room['roomNo'], room['type'], room['price'], room['status'], "Edit | Delete"),iid=room_id)
 
     def on_single_click(self, event):
         # Identify the row and column where the click occurred
@@ -161,7 +161,7 @@ class RoomsView:
 
         if item_id and column_id == '#5':  # '#5' corresponds to the "actions" column
             room_data = self.room_list.item(item_id, "values")
-            room_id = room_data[0]  # Assuming room ID is in the first column
+            room_id = item_id  # Assuming room ID is in the first column
             
             # Get the x-coordinate within the actions column to determine if "Edit" or "Delete" was clicked
             x_offset = event.x - self.room_list.bbox(item_id, column_id)[0]
@@ -170,12 +170,12 @@ class RoomsView:
             if x_offset < 75:  # Approximate midpoint of 150 width
                 self.initiate_edit(room_data)
             else:
-                self.delete_room(room_data)
+                self.delete_room(room_id)
 
     def initiate_edit(self, room_data):
         self.current_room_id = room_data[0]
-        self.is_edit_mode = True
-        self.add_button.config(text="Update Room")
+        self.is_edit_mode = True 
+        self.add_button.config(text="Update Room")  
         self.cancel_button.pack(pady=10, fill="x", ipady=5)
 
         # Populate form fields
