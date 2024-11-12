@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 from app.auth.auth_controller import AuthController
+from utils import Utils
 
 class RegistrationView:
     def __init__(self, root, switch_to_login):
@@ -10,6 +11,9 @@ class RegistrationView:
 
         self.root.title("Registration")
         self.root.geometry("1000x600")
+        
+        # Creating obj of Utils class
+        self.utils = Utils()
 
         # Main container frame for split design
         container = tk.Frame(root, bg="white")
@@ -35,6 +39,11 @@ class RegistrationView:
         tk.Label(left_frame, text="Username", bg="white", font=("Helvetica", 12)).pack(anchor='w')
         self.username_entry = tk.Entry(left_frame, font=("Helvetica", 14), bd=2, relief="solid")
         self.username_entry.pack(fill="x", pady=10, ipady=5)
+        
+        # Email label and entry
+        tk.Label(left_frame, text="Email", bg="white", font=("Helvetica", 12)).pack(anchor='w')
+        self.email_entry = tk.Entry(left_frame, font=("Helvetica", 14), bd=2, relief="solid")
+        self.email_entry.pack(fill="x", pady=10, ipady=5)
 
         # Password label and entry
         tk.Label(left_frame, text="Password", bg="white", font=("Helvetica", 12)).pack(anchor='w')
@@ -54,9 +63,15 @@ class RegistrationView:
         name = self.name_entry.get()
         username = self.username_entry.get()
         password = self.password_entry.get()
+        email = self.email_entry.get()
+        
+        if not self.utils.validate_email(email):
+            messagebox.showerror("Error", "Invalid email")
+            return
+        
 
         if name and username and password:
-            if self.auth_controller.register(name, username, password):
+            if self.auth_controller.register(name, username,email, password):
                 messagebox.showinfo("Success", "Registration successful!")
                 self.switch_to_login()
             else:

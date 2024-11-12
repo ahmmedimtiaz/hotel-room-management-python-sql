@@ -3,6 +3,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 from app.room.room_controller import RoomController
+from app.auth.auth_controller import AuthController
 
 class RoomsView:
     def __init__(self, parent, primary_color, secondary_color):
@@ -10,6 +11,9 @@ class RoomsView:
         self.secondary_color = secondary_color
         self.is_edit_mode = False  # Track whether we're in "edit" mode
         self.current_room_id = None  # Track room being edited
+        
+        # Auth Controller
+        # self.auth_controller = AuthController()
 
         # Initialize the controller with a reference to self
         self.controller = RoomController(self)
@@ -55,11 +59,18 @@ class RoomsView:
         self.price_entry = tk.Entry(self.form_frame, font=("Helvetica", 14), bd=2, relief="solid")
         self.price_entry.pack(fill="x", pady=10, ipady=5)
 
-        # Room Status
-        tk.Label(self.form_frame, text="Status:", bg=self.secondary_color, fg=self.primary_color, font=("Helvetica", 12)).pack(anchor="w")
-        self.status_entry = tk.Entry(self.form_frame, font=("Helvetica", 14), bd=2, relief="solid")
-        self.status_entry.pack(fill="x", pady=10, ipady=5)
+       # Create a StringVar to hold the status selection
+        self.status_var = tk.StringVar(value="Select Status")  # Default placeholder text
 
+        # Define the options for room status
+        status_options = ["available", "unavailable"]
+
+        # Create the OptionMenu widget for selecting room status
+        self.status_entry = tk.OptionMenu(self.form_frame, self.status_var, *status_options)
+        self.status_entry.config(font=("Helvetica", 14), bd=2, relief="solid")
+        self.status_entry.pack(fill="x", pady=10, ipady=5)
+        
+        
         # Action Buttons
         self.add_button = tk.Button(
             self.form_frame, text="Add Room", font=("Helvetica", 14, "bold"), 
@@ -79,8 +90,9 @@ class RoomsView:
         room_no = self.room_no_entry.get()
         room_type = self.type_entry.get()
         price = self.price_entry.get()
-        status = self.status_entry.get()
-
+        status = self.status_var.get()
+        # curr_userId = self.auth_controller.get_current_user()
+        # print(curr_userId)
         if self.is_edit_mode:
             # Update room
             self.controller.update_room(self.current_room_id, room_no, room_type, price, status)
@@ -118,7 +130,8 @@ class RoomsView:
         self.search_button.pack(side="left", padx=5)
 
         # Room List Table, including "actions" in columns
-        self.room_list = ttk.Treeview(self.data_frame, columns=("roomNo", "type", "price", "status", "actions"), show="headings")
+        self.room_list = ttk.Treeview(self.data_frame, columns=("roomId","roomNo", "type", "price", "status", "actions"), show="headings")
+        self.room_list.heading("roomId", text="Room Id")
         self.room_list.heading("roomNo", text="Room No")
         self.room_list.heading("type", text="Type")
         self.room_list.heading("price", text="Price")
@@ -126,8 +139,8 @@ class RoomsView:
         self.room_list.heading("actions", text="Actions")
 
         # Set column widths and center-align
-        for col in ("roomNo", "type", "price", "status"):
-            self.room_list.column(col, anchor="center", width=100)
+        for col in ("roomId","roomNo", "type", "price", "status"):
+            self.room_list.column(col, anchor="center", width=60)
         self.room_list.column("actions", anchor="center", width=150)  # Extra space for actions
 
         # Bind single-click event for action handling
@@ -152,14 +165,14 @@ class RoomsView:
         # Insert new data into room list with action labels as text
         for room in rooms:
             room_id = room['Id']
-            self.room_list.insert("", "end", values=(room['roomNo'], room['type'], room['price'], room['status'], "Edit | Delete"),iid=room_id)
+            self.room_list.insert("", "end", values=(room['Id'],room['roomNo'], room['type'], room['price'], room['status'], "Edit | Delete"),iid=room_id)
 
     def on_single_click(self, event):
         # Identify the row and column where the click occurred
         item_id = self.room_list.identify_row(event.y)
         column_id = self.room_list.identify_column(event.x)
 
-        if item_id and column_id == '#5':  # '#5' corresponds to the "actions" column
+        if item_id and column_id == '#6':  # '#6' corresponds to the "actions" column
             room_data = self.room_list.item(item_id, "values")
             room_id = item_id  # Assuming room ID is in the first column
             

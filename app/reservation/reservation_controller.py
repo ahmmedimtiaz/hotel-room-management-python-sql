@@ -33,4 +33,4 @@ class ReservationController:
     def refresh_reservation_list(self):
         """Refreshes the view's reservation list with the latest data from the model."""
         reservations = self.model.fetch_all_reservations()
-        self.view.update_reservation_list(reservations)
+        self.view.update_reservations_list(reservations)

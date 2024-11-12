@@ -7,8 +7,8 @@ class RoomController:
         self.model = RoomModel()
         self.view = view
 
-    def add_room(self, room_no, room_type, price, status):
-        self.model.create_room(room_no, room_type, price, status)
+    def add_room(self, room_no, room_type, price, status, created_by=1):
+        self.model.create_room(room_no, room_type, price, status,created_by)
         self.refresh_room_list()
 
     def get_all_rooms(self):

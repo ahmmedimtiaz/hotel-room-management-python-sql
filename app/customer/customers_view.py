@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 from app.customer.customer_controller import CustomerController
+import re
 
 class CustomersView:
     def __init__(self, parent, primary_color, secondary_color):
@@ -76,6 +77,19 @@ class CustomersView:
         customer_email = self.email_entry.get()
         customer_phone = self.phone_entry.get()
         customer_address = self.address_entry.get()
+        
+        # Validate email
+        if not self.validate_email(customer_email):
+            messagebox.showerror("Invalid Email", "Please enter a valid email address.")
+            return
+
+        # Validate phone number
+        if not self.validate_phone(customer_phone):
+            messagebox.showerror("Invalid Phone Number", "Please enter a valid 11-digit phone number.")
+            return
+        if customer_address == "" or customer_name == "":
+            messagebox.showerror("Invalid Entry", "Please fill all fields")
+            return
 
         if self.is_edit_mode:
             # Update customer
@@ -84,7 +98,7 @@ class CustomersView:
         else:
             # Add new customer
             self.controller.add_customer(customer_name, customer_email, customer_phone, customer_address)
-
+            messagebox.showinfo("Success", "New Customer added successfully.")
     def reset_form(self):
         """ Resets the form to add mode and clears entries """
         self.name_entry.delete(0, tk.END)
@@ -114,7 +128,8 @@ class CustomersView:
         self.search_button.pack(side="left", padx=5)
 
         # Customer List Table, including "actions" in columns
-        self.customer_list = ttk.Treeview(self.data_frame, columns=("name", "email", "phone", "address", "actions"), show="headings")
+        self.customer_list = ttk.Treeview(self.data_frame, columns=("Id","name", "email", "phone", "address", "actions"), show="headings")
+        self.customer_list.heading("Id", text="Customer Id")
         self.customer_list.heading("name", text="Name")
         self.customer_list.heading("email", text="Email")
         self.customer_list.heading("phone", text="Phone")
@@ -122,8 +137,8 @@ class CustomersView:
         self.customer_list.heading("actions", text="Actions")
 
         # Set column widths and center-align
-        for col in ("name", "email", "phone", "address"):
-            self.customer_list.column(col, anchor="center", width=150)
+        for col in ("Id","name", "email", "phone", "address"):
+            self.customer_list.column(col, anchor="center", width=80)
         self.customer_list.column("actions", anchor="center", width=150)  # Extra space for actions
 
         # Bind single-click event for action handling
@@ -148,14 +163,14 @@ class CustomersView:
         # Insert new data into customer list with action labels as text
         for customer in customers:
             customer_id = customer['Id']  # Assuming the customer data contains 'Id'
-            self.customer_list.insert("", "end", values=(customer['name'], customer['email'], customer['phone'], customer['address'], "Edit | Delete"), iid=customer_id)
+            self.customer_list.insert("", "end", values=(customer['Id'],customer['name'], customer['email'], customer['phone'], customer['address'], "Edit | Delete"), iid=customer_id)
 
     def on_single_click(self, event):
         # Identify the row and column where the click occurred
         item_id = self.customer_list.identify_row(event.y)
         column_id = self.customer_list.identify_column(event.x)
 
-        if item_id and column_id == '#5':  # '#5' corresponds to the "actions" column
+        if item_id and column_id == '#6':  # '#6' corresponds to the "actions" column
             # Retrieve customer_id from item_id directly
             customer_id = item_id
 
@@ -177,18 +192,20 @@ class CustomersView:
 
         # Populate form fields
         self.name_entry.delete(0, tk.END)
-        self.name_entry.insert(0, customer_data[0])
+        self.name_entry.insert(0, customer_data[1])
         self.email_entry.delete(0, tk.END)
-        self.email_entry.insert(0, customer_data[1])
+        self.email_entry.insert(0, customer_data[2])
         self.phone_entry.delete(0, tk.END)
-        self.phone_entry.insert(0, customer_data[2])
+        self.phone_entry.insert(0, customer_data[3])
         self.address_entry.delete(0, tk.END)
-        self.address_entry.insert(0, customer_data[3])
+        self.address_entry.insert(0, customer_data[4])
 
-    def delete_customer(self, customer_data):
+    def delete_customer(self, customer_id):
         response = messagebox.askyesno("Confirm Delete", "Are you sure you want to delete this room?")
         if response:
-            customer_id = customer_data[0]
+            # customer_id = customer_data[0]
             print(customer_id)
             self.controller.delete_customer(customer_id)
             self.controller.refresh_customer_list() 
+
+   

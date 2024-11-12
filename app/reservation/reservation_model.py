@@ -26,6 +26,23 @@ class ReservationModel:
         query = "SELECT * FROM reservations"
         self.cursor.execute(query)
         return self.cursor.fetchall()
+    
+    # Fetching all Room Id for the dropdown
+    def fetch_rooms(self):
+        """Fetches all room IDs from the rooms table."""
+        query = "SELECT Id,price FROM rooms WHERE status='available'"  # Select all Available Room ID
+        self.cursor.execute(query)
+        result = self.cursor.fetchall()
+        return result  
+        # return [room['Id'] for room in result]  # Extract room numbers into a list
+
+  
+    def fetch_customer_ids(self):
+        """Fetches all Customer IDs from the Customer table."""
+        query = "SELECT Id FROM customers"  #Select All Customers
+        self.cursor.execute(query)
+        result = self.cursor.fetchall()
+        return [customer['Id'] for customer in result]  # Extract Customers Id into a list
 
     def search_reservations(self, keyword):
         """Searches reservations by matching keyword with room ID, customer ID, or status."""
