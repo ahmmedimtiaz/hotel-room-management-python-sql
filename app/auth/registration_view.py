@@ -65,6 +65,16 @@ class RegistrationView:
         password = self.password_entry.get()
         email = self.email_entry.get()
         
+        if not self.utils.is_unique_username(username):
+            messagebox.showerror("Error", "username already exists")
+            return
+        if not self.utils.is_valid_name(name):
+            messagebox.showerror("Error", "Name Should be at least 4 characters")
+            return
+        if not self.utils.is_strong_password(password):
+            messagebox.showerror("Error", "Password should be at least 8 characters and contain at least one number")
+        
+        
         if not self.utils.validate_email(email):
             messagebox.showerror("Error", "Invalid email")
             return
